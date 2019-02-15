@@ -88,7 +88,20 @@ namespace Sitecore.Support.Modules.EmailCampaign.Core
         }
         if (!flag)
         {
-          flag = link.StartsWith(message.ManagerRoot.Settings.BaseURL);
+          //flag = link.StartsWith(message.ManagerRoot.Settings.BaseURL);
+
+          //Fix Sitecore.Support.301981: strict checking against host
+          try
+          {
+            var linkUri = new Uri(link);
+            var baseUri = new Uri(message.ManagerRoot.Settings.BaseURL);
+            flag = linkUri.Scheme == baseUri.Scheme && linkUri.Host == baseUri.Host;
+          }
+          catch (UriFormatException e)
+          {
+            //not expected but ignore if happens
+          }        
+          //End fix Sitecore.Support.301981
         }
         if (!(flag || Sitecore.Support.Modules.EmailCampaign.Core.ExternalLinks.IsLinkRegistered(message, link)))
         {
